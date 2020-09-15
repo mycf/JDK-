@@ -193,6 +193,13 @@ public class Executors {
      * pools with similar properties but different details (for example, timeout
      * parameters) may be created using {@link ThreadPoolExecutor} constructors.
      *
+     * 创建一个线程池，该线程池根据需要创建新线程，但是将在先前构造的线程可用时重用它们。
+     * 这些线程池通常将提高执行许多短期异步任务的程序的性能。
+     * 调用{@code execute}将重用以前构造的线程（如果有）。
+     * 如果没有可用的现有线程，则将创建一个新线程并将其添加到池中。
+     * 六十秒内未使用的线程将终止并从缓存中删除。
+     * 因此，保持空闲时间足够长的线程池不会消耗任何资源。
+     * 请注意，可以使用{@link ThreadPoolExecutor}构造函数创建具有相似属性但细节不同（例如，超时参数）的线程池。
      * @return the newly created thread pool
      */
     public static ExecutorService newCachedThreadPool() {

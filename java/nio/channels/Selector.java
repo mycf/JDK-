@@ -309,6 +309,12 @@ public abstract class Selector implements Closeable {
      * <p> This method does not offer real-time guarantees: It schedules the
      * timeout as if by invoking the {@link Object#wait(long)} method. </p>
      *
+     * selects是一组key，其相应的通道已准备好进行I/O操作。
+     *
+     * 此方法执行阻塞<a href="#selop">selection</a>。在至少选择了一个channel后返回，
+     * 调用此选择器的{@link #wakeup 唤醒}方法，当前线程被中断或给定的超时时间到期之后（以先到者为准），它才返回。
+     *
+     * 此方法不提供实时保证：它像通过调用{@link Object＃wait（long）}方法来超时。
      * @param  timeout  If positive, block for up to <tt>timeout</tt>
      *                  milliseconds, more or less, while waiting for a
      *                  channel to become ready; if zero, block indefinitely;

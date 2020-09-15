@@ -53,6 +53,9 @@ public abstract class OutputStream implements Closeable, Flushable {
      * <p>
      * Subclasses of <code>OutputStream</code> must provide an
      * implementation for this method.
+     * 将指定的字节写入此输出流。 write 的一般约定是将一个字节写入输出流。
+     * 要写入的字节是参数 b 的八个低位。 b 的24个高位被忽略。 OutputStream 的
+     * 子类必须提供此方法的实现。
      *
      * @param      b   the <code>byte</code>.
      * @exception  IOException  if an I/O error occurs. In particular,

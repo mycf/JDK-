@@ -38,6 +38,9 @@ import sun.nio.ch.FileChannelImpl;
  * such as image data. For reading streams of characters, consider using
  * <code>FileReader</code>.
  *
+ * FileInputStream 从文件系统中的文件获取输入字节。可用的文件取决于主机环境。
+ * FileInputStream 用于读取原始字节流，例如图像数据。要读取字符流，请考虑使用 FileReader 。
+ *
  * @author  Arthur van Hoff
  * @see     java.io.File
  * @see     java.io.FileDescriptor

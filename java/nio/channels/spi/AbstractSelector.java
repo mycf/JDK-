@@ -213,6 +213,7 @@ public abstract class AbstractSelector
                         AbstractSelector.this.wakeup();
                     }};
         }
+        // 设置线程blocker
         AbstractInterruptibleChannel.blockedOn(interruptor);
         Thread me = Thread.currentThread();
         if (me.isInterrupted())

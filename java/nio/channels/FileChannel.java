@@ -339,11 +339,14 @@ public abstract class FileChannel
 
     /**
      * Reads a sequence of bytes from this channel into the given buffer.
+     * 从该通道读取字节序列到给定的缓冲区。
      *
      * <p> Bytes are read starting at this channel's current file position, and
      * then the file position is updated with the number of bytes actually
      * read.  Otherwise this method behaves exactly as specified in the {@link
-     * ReadableByteChannel} interface. </p>
+     * ReadableByteChannel} interface.
+     * 从该通道的当前文件位置开始读取字节，然后使用实际读取的字节数更新文件位置。
+     * 否则，此方法的行为与{@link ReadableByteChannel}接口中指定的行为完全相同。</p>
      */
     public abstract int read(ByteBuffer dst) throws IOException;
 

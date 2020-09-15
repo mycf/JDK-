@@ -628,6 +628,11 @@ public class Runtime {
      * processors should therefore occasionally poll this property and adjust
      * their resource usage appropriately. </p>
      *
+     * 返回Java虚拟机可用的处理器数量。
+     *
+     * 这个值可能在虚拟机的特定调用期间改变。
+     * 因此，对可用处理器数量敏感的应用程序应该偶尔轮询此属性并适当调整其资源使用情况。
+     *
      * @return  the maximum number of processors available to the virtual
      *          machine; never smaller than one
      * @since 1.4

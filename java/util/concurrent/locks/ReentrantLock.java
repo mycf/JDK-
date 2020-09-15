@@ -125,20 +125,28 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         /**
          * Performs non-fair tryLock.  tryAcquire is implemented in
          * subclasses, but both need nonfair try for trylock method.
+         *
+         * 执行不公平tryLock。tryAcquire在子类中实现，但是都需要对trylock方法进行不公平的尝试。
          */
         final boolean nonfairTryAcquire(int acquires) {
             final Thread current = Thread.currentThread();
+            // 获取同步状态
             int c = getState();
             if (c == 0) {
+                // cas操作
                 if (compareAndSetState(0, acquires)) {
+                    // 设置当前线程拥有访问权
                     setExclusiveOwnerThread(current);
                     return true;
                 }
             }
+            // 当前线程已获取锁 重入
             else if (current == getExclusiveOwnerThread()) {
+                // 同步状态
                 int nextc = c + acquires;
                 if (nextc < 0) // overflow
                     throw new Error("Maximum lock count exceeded");
+                // 设置同步状态
                 setState(nextc);
                 return true;
             }
@@ -201,6 +209,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         /**
          * Performs lock.  Try immediate barge, backing up to normal
          * acquire on failure.
+         * 执行加锁。尝试直接，失败恢复到正常获取
          */
         final void lock() {
             if (compareAndSetState(0, 1))
@@ -328,6 +337,24 @@ public class ReentrantLock implements Lock, java.io.Serializable {
      * <p>In this implementation, as this method is an explicit
      * interruption point, preference is given to responding to the
      * interrupt over normal or reentrant acquisition of the lock.
+     *
+     * 获取锁除非当前线程{@linkplain Thread#interrupt interrupted}
+     *
+     * 如果锁没有被其他线程占有获取锁并且立即返回，设置锁持有数为1
+     *
+     * 如果当前线程已经持有这个锁，那么持有数增加1，并且该方法立即返回。
+     *
+     * 如果锁被另一个线程持有，那么当前线程将被禁用以用于线程调度，并处于休眠状态，直到发生两种情况之一：
+     *      锁由当前线程获得；
+     *      其他线程{@linkplain Thread#interrupt interrupts}中断当前线程。
+     *
+     * 如果当前线程获得了锁，则锁持有计数设置为1。
+     * 如果当前线程：
+     *      在进入此方法时已设置其中断状态；
+     *      获取锁时被{@linkplain Thread#interrupt interrupted}中断了
+     * 然后会抛出{@link InterruptedException}并清除当前线程的中断状态。
+     *
+     * 在此实现中，由于此方法是显式的中断点，因此优先考虑对中断的响应，而不是正常或可重入的锁获取。
      *
      * @throws InterruptedException if the current thread is interrupted
      */

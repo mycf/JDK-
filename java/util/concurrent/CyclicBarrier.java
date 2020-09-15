@@ -474,8 +474,8 @@ public class CyclicBarrier {
     }
 
     /**
-     * Returns the number of parties currently waiting at the barrier.
-     * This method is primarily useful for debugging and assertions.
+     *
+     * 返回当前在barrier处等待的parties数量。此方法主要用于调试和断言。
      *
      * @return the number of parties currently blocked in {@link #await}
      */

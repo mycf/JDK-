@@ -38,6 +38,10 @@ import java.util.function.UnaryOperator;
  * accessed using an integer index. However, the size of a
  * {@code Vector} can grow or shrink as needed to accommodate
  * adding and removing items after the {@code Vector} has been created.
+ * {@code Vector}类实现对象的可增长数组。像数组一样，
+ * 它包含可以使用整数索引访问的组件。
+ * 但是，{@code Vector}的大小可以根据需要增大或缩小，
+ * 以适应在创建{@code Vector}之后添加和删除项目。
  *
  * <p>Each vector tries to optimize storage management by maintaining a
  * {@code capacity} and a {@code capacityIncrement}. The
@@ -47,6 +51,12 @@ import java.util.function.UnaryOperator;
  * {@code capacityIncrement}. An application can increase the
  * capacity of a vector before inserting a large number of
  * components; this reduces the amount of incremental reallocation.
+ * 每个vector都尝试通过维持{@code capacity}和
+ * {@code capacityIncrement}来优化存储管理。
+ * {@code capacity}始终至少与vector大小一样大；
+ * 它通常更大，因为随着向vector中添加组件，
+ * vector的存储量将以{@code capacityIncrement}的大小逐块增加。
+ * 应用程序可以在插入大量组件之前增加vector的容量。这减少了增量重新分配的数量。
  *
  * <p><a name="fail-fast">
  * The iterators returned by this class's {@link #iterator() iterator} and
@@ -60,6 +70,14 @@ import java.util.function.UnaryOperator;
  * than risking arbitrary, non-deterministic behavior at an undetermined
  * time in the future.  The {@link Enumeration Enumerations} returned by
  * the {@link #elements() elements} method are <em>not</em> fail-fast.
+ * 此类的{@link #iterator() 迭代器}和{@link #listIterator(int) listIterator}方法返回的迭代器是fail-fast：
+ * 如果在以下位置对vector进行了结构修改：创建迭代器后的任何时间，
+ * 通过迭代器自己的{@link ListIterator＃remove() remove}或
+ * {@link ListIterator＃add(Object) add}方法之外的任何方式，
+ * 迭代器都会抛出{@link ConcurrentModificationException}。
+ * 因此，面对并发修改，迭代器将快速而干净地失败，
+ * 而不是冒着在未来不确定的时间冒任意，不确定行为的风险。
+ * 由{@link #elements() elements}方法返回的{@link Enumeration Enumerations}不能快速失败。
  *
  * <p>Note that the fail-fast behavior of an iterator cannot be guaranteed
  * as it is, generally speaking, impossible to make any hard guarantees in the
@@ -68,6 +86,11 @@ import java.util.function.UnaryOperator;
  * Therefore, it would be wrong to write a program that depended on this
  * exception for its correctness:  <i>the fail-fast behavior of iterators
  * should be used only to detect bugs.</i>
+ * 请注意，不能保证迭代器的快速失败行为，
+ * 因为通常来说，在存在不同步的并发修改的情况下，不可能做出任何严格的保证。
+ * 快速失败的迭代器会尽最大努力抛出{@code ConcurrentModificationException}。
+ * 因此，编写依赖于此异常的程序来确保程序的正确性是错误的：
+ * 迭代器的快速失败行为应仅用于检测错误。
  *
  * <p>As of the Java 2 platform v1.2, this class was retrofitted to
  * implement the {@link List} interface, making it a member of the
@@ -76,6 +99,10 @@ import java.util.function.UnaryOperator;
  * implementations, {@code Vector} is synchronized.  If a thread-safe
  * implementation is not needed, it is recommended to use {@link
  * ArrayList} in place of {@code Vector}.
+ * 从Java 2平台v1.2开始，对该类进行了改进以实现{@link List}接口，
+ * 使其成为 Java Collections Framework。
+ * 与新的集合实现不同，{@code Vector}是同步的。
+ * 如果不需要线程安全的实现，建议使用{@link ArrayList}代替{@code Vector}。
  *
  * @author  Lee Boynton
  * @author  Jonathan Payne
@@ -215,6 +242,7 @@ public class Vector<E>
      * Increases the capacity of this vector, if necessary, to ensure
      * that it can hold at least the number of components specified by
      * the minimum capacity argument.
+     * 如有必要，增加此vector的容量，以确保它至少可以容纳最小容量参数指定的组件数。
      *
      * <p>If the current capacity of this vector is less than
      * {@code minCapacity}, then its capacity is increased by replacing its
@@ -225,6 +253,13 @@ public class Vector<E>
      * the new capacity will be twice the old capacity; but if this new size
      * is still smaller than {@code minCapacity}, then the new capacity will
      * be {@code minCapacity}.
+     *
+     * 如果此vector的当前容量小于{@code minCapacity}，
+     * 则可以通过将其内部数据数组（保留在{@code elementData}字段中)替换为较大的数组来增加其容量。
+     * 新数据数组的大小将为旧大小加上{@code capacityIncrement}，
+     * 除非{@code capacityIncrement}的值小于或等于零，
+     * 在这种情况下，新容量将为旧容量的两倍；
+     * 但是如果此新大小仍小于{@code minCapacity}，则新容量将为{@code minCapacity}。
      *
      * @param minCapacity the desired minimum capacity
      */
@@ -240,6 +275,8 @@ public class Vector<E>
      * Synchronized methods in this class can internally call this
      * method for ensuring capacity without incurring the cost of an
      * extra synchronization.
+     * 这实现了sureCapacity的非同步语义。
+     * 此类中的同步方法可以在内部调用此方法以确保容量而不会产生额外的同步开销。
      *
      * @see #ensureCapacity(int)
      */
@@ -254,18 +291,21 @@ public class Vector<E>
      * Some VMs reserve some header words in an array.
      * Attempts to allocate larger arrays may result in
      * OutOfMemoryError: Requested array size exceeds VM limit
+     * 要分配的最大数组大小。
+     * 一些VM在数组中保留一些header words。
+     * 尝试分配更大的数组可能会导致OutOfMemoryError：请求的数组大小超出VM限制
      */
     private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;
 
     private void grow(int minCapacity) {
         // overflow-conscious code
         int oldCapacity = elementData.length;
-        int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
+        int newCapacity = oldCapacity + ((capacityIncrement > 0) ?      // capacityIncrement大于0返回capacityIncrement否则增加一倍
                                          capacityIncrement : oldCapacity);
         if (newCapacity - minCapacity < 0)
-            newCapacity = minCapacity;
+            newCapacity = minCapacity;          // minCapacity大于newCapacity为minCapacity
         if (newCapacity - MAX_ARRAY_SIZE > 0)
-            newCapacity = hugeCapacity(minCapacity);
+            newCapacity = hugeCapacity(minCapacity);        // 新容量最大为Integer.MAX_VALUE
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
 
@@ -282,6 +322,8 @@ public class Vector<E>
      * current size, new {@code null} items are added to the end of
      * the vector. If the new size is less than the current size, all
      * components at index {@code newSize} and greater are discarded.
+     * 设置此vector的大小。如果新大小大于当前大小，则新{@code null}项将添加到vector的末尾。
+     * 如果新大小小于当前大小，则将丢弃索引{@code newSize}和更大的所有组件。
      *
      * @param  newSize   the new size of this vector
      * @throws ArrayIndexOutOfBoundsException if the new size is negative
@@ -300,6 +342,7 @@ public class Vector<E>
 
     /**
      * Returns the current capacity of this vector.
+     * 返回此vector的当前容量
      *
      * @return  the current capacity (the length of its internal
      *          data array, kept in the field {@code elementData}
@@ -311,6 +354,7 @@ public class Vector<E>
 
     /**
      * Returns the number of components in this vector.
+     * 返回此vector的组件数量
      *
      * @return  the number of components in this vector
      */
@@ -320,6 +364,7 @@ public class Vector<E>
 
     /**
      * Tests if this vector has no components.
+     * 校验如果此vector没有组件
      *
      * @return  {@code true} if and only if this vector has
      *          no components, that is, its size is zero;
@@ -334,6 +379,8 @@ public class Vector<E>
      * returned {@code Enumeration} object will generate all items in
      * this vector. The first item generated is the item at index {@code 0},
      * then the item at index {@code 1}, and so on.
+     * 返回此vector的组件的枚举。返回的{@code Enumeration}对象将生成此vector中的所有项。
+     * 生成的第一个项目是索引{@code 0}上的项，然后是索引{@code 1}上的项，等等。
      *
      * @return  an enumeration of the components of this vector
      * @see     Iterator
@@ -630,6 +677,9 @@ public class Vector<E>
      * component in the vector with an index greater or equal to the
      * object's index is shifted downward to have an index one smaller
      * than the value it had previously.
+     * 从该vector中删除参数的第一个（索引最低的）出现。
+     * 如果在此vector中找到该对象，则索引大于或等于对象的索引的vector中每个组件将向下移动，
+     * 索引小于其以前的值。
      *
      * <p>This method is identical in functionality to the
      * {@link #remove(Object)} method (which is part of the
@@ -775,6 +825,7 @@ public class Vector<E>
 
     /**
      * Appends the specified element to the end of this Vector.
+     * 在Vector末尾增加一个指定的元素
      *
      * @param e element to be appended to this Vector
      * @return {@code true} (as specified by {@link Collection#add})
@@ -793,6 +844,8 @@ public class Vector<E>
      * formally, removes the element with the lowest index i such that
      * {@code (o==null ? get(i)==null : o.equals(get(i)))} (if such
      * an element exists).
+     * 删除此Vector中指定元素的第一次出现 如果Vector不包含该元素，则该元素保持不变。
+     * 更正式地，删除索引最低的i的元素，以便 {@code (o= null ? get(i)==null : o.equals(get(i)))}(如果存在此类元素)。
      *
      * @param o element to be removed from this Vector, if present
      * @return true if the Vector contained the specified element

@@ -577,6 +577,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * Structural modifications are those that change the size of the
      * list, or otherwise perturb it in such a fashion that iterations in
      * progress may yield incorrect results.
+     * 此列表被结构修改的次数。结构修改是指更改列表大小或以其他方式干扰列表的方式，即正在进行的迭代可能会产生错误的结果。
      *
      * <p>This field is used by the iterator and list iterator implementation
      * returned by the {@code iterator} and {@code listIterator} methods.

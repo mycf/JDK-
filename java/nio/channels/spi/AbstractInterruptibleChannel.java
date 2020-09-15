@@ -151,9 +151,14 @@ public abstract class AbstractInterruptibleChannel
      * method, using a <tt>try</tt>&nbsp;...&nbsp;<tt>finally</tt> block as
      * shown <a href="#be">above</a>, in order to implement asynchronous
      * closing and interruption for this channel.  </p>
+     *
+     * 标记可能无限期阻塞的I/O操作的开始。
+     * 此方法应与{@link #end end}方法一起调用，使用try...finally块，如上所示，
+     * 以实现此通道的异步关闭和中断。
      */
     protected final void begin() {
         if (interruptor == null) {
+            // 初始化interruptor
             interruptor = new Interruptible() {
                     public void interrupt(Thread target) {
                         synchronized (closeLock) {
@@ -162,11 +167,13 @@ public abstract class AbstractInterruptibleChannel
                             open = false;
                             interrupted = target;
                             try {
+                                // 关闭通道
                                 AbstractInterruptibleChannel.this.implCloseChannel();
                             } catch (IOException x) { }
                         }
                     }};
         }
+        // 设置当前线程的blocker
         blockedOn(interruptor);
         Thread me = Thread.currentThread();
         if (me.isInterrupted())

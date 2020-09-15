@@ -182,6 +182,23 @@ public abstract class SelectableChannel
      * the key returned by this method will have been cancelled and will
      * therefore be invalid. </p>
      *
+     * 使用给定的selector注册此通道，并返回selectionkey。
+     *
+     * <p>如果此通道当前已在给定的选择器中注册，则返回代表该注册的选择键。
+     * 该键的兴趣集将更改为ops，就像通过调用
+     * {@link SelectionKey#interestOps(int) interestOps(int)}方法一样。
+     * 如果 att 参数不是 null ，则key的attachment将被设置为该值。
+     * 如果key已经被取消，将抛出{@link CancelledKeyException}。</p>
+     *
+     * <p>否则，该通道尚未在给定的选择器中注册，因此注册并返回生成的新key。
+     * 该key的初始兴趣集将是 ops ，其附件将是 att 。</p>
+     *
+     * <p>可以随时调用此方法。如果在此方法的其他调用或{@link #configureBlocking(boolean) configureBlocking}方法
+     * 正在进行时调用此方法，则它将首先阻塞，直到其他操作完成。然后，此方法将在选择器的键集上同步，
+     * 因此如果与涉及同一选择器的另一个注册或选择操作同时调用，则可能会阻塞。</p>
+     *
+     * <p>如果在执行此操作时关闭了此通道，则此方法返回的键将被取消，因此将无效。</p>
+     *
      * @param  sel
      *         The selector with which this channel is to be registered
      *
@@ -242,6 +259,11 @@ public abstract class SelectableChannel
      * <blockquote><tt>sc.{@link
      * #register(java.nio.channels.Selector,int,java.lang.Object)
      * register}(sel, ops, null)</tt></blockquote>
+     * 使用给定的selector注册此通道，并返回selectionkey。
+     *
+     * <p>调用sc.register(sel，op)式的此便捷方法的行为与调用
+     * sc.{@link #register(java.nio.channels.Selector，int，java.lang.Object) register}（sel，ops，null）的行为完全相同。
+     *
      *
      * @param  sel
      *         The selector with which this channel is to be registered
@@ -273,6 +295,7 @@ public abstract class SelectableChannel
      *
      * @return  A key representing the registration of this channel with
      *          the given selector
+     *          代表此通道在给定选择器中的注册的key
      */
     public final SelectionKey register(Selector sel, int ops)
         throws ClosedChannelException

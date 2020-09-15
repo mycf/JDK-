@@ -263,6 +263,12 @@ public abstract class SelectionKey {
      * another connection, or has an error pending, then it will add
      * <tt>OP_ACCEPT</tt> to the key's ready set and add the key to its
      * selected-key&nbsp;set.  </p>
+     *
+     * 套接字接受操作的操作设置位。
+     *
+     * <p>假设选择键的兴趣集在选择操作开始时包含OP_ACCEPT。
+     * 如果选择器检测到相应的服务器套接字通道已准备好接受另一个连接，或者有待处理的错误，
+     * 则它将在key的就绪集中添加OP_ACCEPT 并将key添加到其selectedkey集。</p>
      */
     public static final int OP_ACCEPT = 1 << 4;
 

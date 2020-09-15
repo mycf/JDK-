@@ -51,6 +51,20 @@ package java.util;
  * When an observable object is newly created, its set of observers is
  * empty. Two observers are considered the same if and only if the
  * <tt>equals</tt> method returns true for them.
+ * 此类表示模型视图范式中的可观察对象或"数据"。
+ * 它可以子类化以表示应用程序想要观察到的对象。
+ *
+ * 可观测对象可以有一个或多个观察器。
+ * 观察者可能是实现接口Observer的任何对象。
+ * 可观察实例更改后，调用{@link Observable#notifyObservers}方法的应用程序通过调用其update方法来通知其所有观察者更改。
+ *
+ * 通知的传递顺序未指定。可观察类中提供的默认实现将按观察者注册兴趣的顺序通知观察者，
+ * 但子类可能会更改此顺序、不使用保证顺序、在单独的线程上传递通知，或者可能保证其子类按其选择遵循此顺序。
+ *
+ * 注意此通知机制与线程没有任何关系，
+ * 并且与类对象的wait和notify机制完全分离。
+ *
+ * 当新创建可观察对象时，其观察对象集为空。仅当equals方法返回true，两个观察者被视为相同的。
  *
  * @author  Chris Warth
  * @see     java.util.Observable#notifyObservers()
@@ -123,6 +137,11 @@ public class Observable {
      * <p>
      * Each observer has its <code>update</code> method called with two
      * arguments: this observable object and the <code>arg</code> argument.
+     * 如果此对象已更改，如hasChanged方法所示，则通知其所有观察器，
+     * 然后调用clearChanged方法，以指示此对象不再更改。
+     *
+     * 每个观察者都有其update方法，用两个参数调用：
+     * 这个可观察对象和arg参数。
      *
      * @param   arg   any object.
      * @see     java.util.Observable#clearChanged()
@@ -133,6 +152,7 @@ public class Observable {
         /*
          * a temporary array buffer, used as a snapshot of the state of
          * current Observers.
+         * 临时数组缓冲区，用作当前观察者状态的快照。
          */
         Object[] arrLocal;
 
@@ -148,6 +168,11 @@ public class Observable {
              *   notification in progress
              * 2) a recently unregistered Observer will be
              *   wrongly notified when it doesn't care
+             * 我们不希望观察者在持有自己的监视器时对任意代码进行回调。
+             * 我们从 Vector 提取每个可观察者并存储观察者状态的代码需要同步，
+             * 但通知观察者不需要（不应）。这里任何潜在的竞争条件的最差结果是：
+             * 1） 新添加的观察者将错过正在进行中的通知
+             * 2） 最近未注册的观察者在不在乎时将收到错误通知
              */
             if (!changed)
                 return;

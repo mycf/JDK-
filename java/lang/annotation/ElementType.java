@@ -72,6 +72,7 @@ package java.lang.annotation;
  */
 public enum ElementType {
     /** Class, interface (including annotation type), or enum declaration */
+    // 类、接口（包括注释类型）或枚举声明
     TYPE,
 
     /** Field declaration (includes enum constants) */

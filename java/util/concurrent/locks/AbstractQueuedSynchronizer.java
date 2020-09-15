@@ -55,6 +55,8 @@ import sun.misc.Unsafe;
  * #setState} and {@link #compareAndSetState} is tracked with respect
  * to synchronization.
  *
+ * 
+ * 
  * <p>Subclasses should be defined as non-public internal helper
  * classes that are used to implement the synchronization properties
  * of their enclosing class.  Class
@@ -474,6 +476,12 @@ public abstract class AbstractQueuedSynchronizer
          * re-acquire. And because conditions can only be exclusive,
          * we save a field by using special value to indicate shared
          * mode.
+         *
+         * 链接到下一个等待条件的节点，或特殊值SHARED。
+         * 因为条件队列仅在以独占模式持有时才会被访问，
+         * 我们只需要一个简单的链接队列以在节点等待时保存它们。
+         * 然后将它们转移到队列以重新获得。因为条件只能是排他性的，
+         * 所以我们通过使用特殊值保存字段用来来表示共享模式。
          */
         Node nextWaiter;
 
@@ -524,6 +532,7 @@ public abstract class AbstractQueuedSynchronizer
     /**
      * Tail of the wait queue, lazily initialized.  Modified only via
      * method enq to add new wait node.
+     * 等待队列的尾部，延迟初始化。仅通过方法enq进行修改以添加新的等待节点。
      */
     private transient volatile Node tail;
 
@@ -535,6 +544,9 @@ public abstract class AbstractQueuedSynchronizer
     /**
      * Returns the current value of synchronization state.
      * This operation has memory semantics of a {@code volatile} read.
+     *
+     * 返回当前同步状态的值。
+     * 该操作具有{@code volatile} read的内存语义。
      * @return current state value
      */
     protected final int getState() {
@@ -555,6 +567,9 @@ public abstract class AbstractQueuedSynchronizer
      * value if the current state value equals the expected value.
      * This operation has memory semantics of a {@code volatile} read
      * and write.
+     *
+     * 如果当前状态值等于期望值，则以原子方式将同步状态设置为给定的更新值。
+     * 该操作具有{@code volatile}读写的内存语义。
      *
      * @param expect the expected value
      * @param update the new value
@@ -598,6 +613,8 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * Creates and enqueues node for current thread and given mode.
+     *
+     * 以当前线程和给定的模式创建并入队节点
      *
      * @param mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared
      * @return the new node
@@ -878,6 +895,7 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * Acquires in exclusive interruptible mode.
+     * 以独占可中断模式获取。
      * @param arg the acquire argument
      */
     private void doAcquireInterruptibly(int arg)
@@ -1201,6 +1219,11 @@ public abstract class AbstractQueuedSynchronizer
     }
 
     /**
+     * 以独占方式获取，如果中断则中止。
+     * 通过首先检查中断状态，然后至少调用一次{@link #tryAcquire}，成功后返回。
+     * 否则，线程将排队，并可能反复阻塞和解除阻塞，调用{@link #tryAcquire}直到成功或线程被中断为止。
+     * 此方法可用于实现方法{@link Lock#lockInterruptible}。
+     *
      * Acquires in exclusive mode, aborting if interrupted.
      * Implemented by first checking interrupt status, then invoking
      * at least once {@link #tryAcquire}, returning on
@@ -1216,8 +1239,10 @@ public abstract class AbstractQueuedSynchronizer
      */
     public final void acquireInterruptibly(int arg)
             throws InterruptedException {
+        // 优先判断线程中断状态，中断抛出异常
         if (Thread.interrupted())
             throw new InterruptedException();
+        // 尝试获取锁
         if (!tryAcquire(arg))
             doAcquireInterruptibly(arg);
     }

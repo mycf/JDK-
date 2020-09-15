@@ -41,10 +41,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * A reusable synchronization barrier, similar in functionality to
- * {@link java.util.concurrent.CyclicBarrier CyclicBarrier} and
- * {@link java.util.concurrent.CountDownLatch CountDownLatch}
- * but supporting more flexible usage.
+ * 可重用的同步屏障，其功能类似于
+ * {@link java.util.concurrent.CyclicBarrier CyclicBarrier}和
+ * {@link java.util.concurrent.CountDownLatch CountDownLatch}，
+ * 但支持更灵活的使用。
  *
  * <p><b>Registration.</b> Unlike the case for other barriers, the
  * number of parties <em>registered</em> to synchronize on a phaser
@@ -58,6 +58,13 @@ import java.util.concurrent.locks.LockSupport;
  * bookkeeping, so tasks cannot query whether they are registered.
  * (However, you can introduce such bookkeeping by subclassing this
  * class.)
+ * 注册。与其他屏障不同，注册要在phaser上进行同步的parties的数量可能会随时间变化。
+ * 任务可以随时注册（使用方法{@link #register}，
+ * {@link #bulkRegister}或建立初始数目parties的构造函数形式），
+ * 也可以选择在到达任何时候注销（使用{@link #arriveAndDeregister}）。
+ * 与大多数基本同步结构一样，注册和注销会只影响内部计数。它们不会建立任何进一步的内部簿记，
+ * 因此任务无法查询它们是否已注册。
+ * （但是，可以通过将此类归为一类来介绍此类记帐。）
  *
  * <p><b>Synchronization.</b> Like a {@code CyclicBarrier}, a {@code
  * Phaser} may be repeatedly awaited.  Method {@link

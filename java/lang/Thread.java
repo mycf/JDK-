@@ -28,6 +28,7 @@ package java.lang;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.nio.channels.spi.AbstractInterruptibleChannel;
 import java.security.AccessController;
 import java.security.AccessControlContext;
 import java.security.PrivilegedAction;
@@ -46,6 +47,7 @@ import sun.security.util.SecurityConstants;
  * A <i>thread</i> is a thread of execution in a program. The Java Virtual
  * Machine allows an application to have multiple threads of execution running
  * concurrently.
+ *
  * <p>
  * Every thread has a priority. Threads with higher priority are executed in
  * preference to threads with lower priority. Each thread may or may not also be
@@ -53,14 +55,13 @@ import sun.security.util.SecurityConstants;
  * <code>Thread</code> object, the new thread has its priority initially set
  * equal to the priority of the creating thread, and is a daemon thread if and
  * only if the creating thread is a daemon.
+ *
  * <p>
  * When a Java Virtual Machine starts up, there is usually a single non-daemon
  * thread (which typically calls the method named <code>main</code> of some
  * designated class). The Java Virtual Machine continues to execute threads
  * until either of the following occurs:
- * 当Java虚拟机启动时，通常只有一个非守护线程（通常调用某些指定类的main方法）。Java虚拟机将继续执行，直到发生一下任何一种情况 已调用类
- * Runtime 的 exit 方法，并且安全管理器已允许进行退出操作。 
- * 不是守护程序线程的所有线程都已死亡，原因可能是从调用返回到run方法或从run方法传播到之外的异常
+ *
  * <ul>
  * <li>The <code>exit</code> method of class <code>Runtime</code> has been
  * called and the security manager has permitted the exit operation to take
@@ -70,9 +71,7 @@ import sun.security.util.SecurityConstants;
  * propagates beyond the <code>run</code> method.
  * </ul>
  * <p>
- * 两种方式创建线程
- * 声明Thread的子类，子类应该重写run方法
- * 声明Runnable接口的实现类，实现run方法
+ *
  * There are two ways to create a new thread of execution. One is to declare a
  * class to be a subclass of <code>Thread</code>. This subclass should override
  * the <code>run</code> method of class <code>Thread</code>. An instance of the
@@ -143,7 +142,6 @@ import sun.security.util.SecurityConstants;
  * 
  * </blockquote>
  * <p>
- * 每个线程都有一个名称用于标识。多个线程的名称可以相同。创建线程时没有指定名称，将自动生成一个
  * Every thread has a name for identification purposes. More than one thread may
  * have the same name. If a name is not specified when a thread is created, a
  * new name is generated for it.
@@ -151,6 +149,59 @@ import sun.security.util.SecurityConstants;
  * Unless otherwise noted, passing a {@code null} argument to a constructor or
  * method in this class will cause a {@link NullPointerException} to be thrown.
  *
+ * 线程是程序中的执行线程。Java虚拟机允许应用程序具有多个并行运行的执行线程。
+ *
+ * 每个线程都有一个优先级。具有较高优先级的线程优先于具有较低优先级的线程执行。
+ * 每个线程可能也可能不被标记为守护线程。当代码在某个线程中运行时，创建一个新的
+ * Thread对象，新线程的优先级最初设置等于创建线程的优先级，并且
+ * 仅当创建线程是守护线程时新线程是守护线程。
+ *
+ * 当Java虚拟机启动时，通常只有一个非守护线程（通常调用某些指定类的main方法）。Java虚拟机将继续执行，
+ * 直到发生下述任何一种情况：
+ * 已调用类Runtime的exit方法，并且安全管理器已允许进行退出操作。
+ * 非守护线程的所有线程都已死亡，原因可能是从调用返回到run方法或从run方法传播到之外的异常
+ *
+ * 有两种方法可以创建新的执行线程。
+ * 一种是将一个类声明为 Thread 的子类。该子类应重写类 Thread 的 run 方法。然后可以分配并启动子类的实例。
+ * 例如，计算素数大于指定值的线程可以编写如下：
+ *     class PrimeThread extends Thread {
+ *         long minPrime;
+ *         PrimeThread(long minPrime) {
+ *             this.minPrime = minPrime;
+ *         }
+ *
+ *         public void run() {
+ *             // compute primes larger than minPrime
+ *             &nbsp;.&nbsp;.&nbsp;.
+ *         }
+ *     }
+ * 下面的代码将创建一个线程并使其开始运行：
+ *
+ * PrimeThread p = new PrimeThread(143);
+ * p.start();
+ *
+ * 创建线程的另一种方法是声明一个类实现Runnable接口。
+ * 然后，该类实现run方法。然后可以分配该类的实例，
+ * 在创建Thread时作为参数传递并启动。
+ * 其他风格的相同示例如下所示：
+ *     class PrimeRun implements Runnable {
+ *         long minPrime;
+ *         PrimeRun(long minPrime) {
+ *             this.minPrime = minPrime;
+ *         }
+ *
+ *         public void run() {
+ *             // compute primes larger than minPrime
+ *             &nbsp;.&nbsp;.&nbsp;.
+ *         }
+ *     }
+ * 下面的代码将创建一个线程并使其开始运行：
+ * PrimeRun p = new PrimeRun(143);
+ * new Thread(p).start();
+ *
+ * 每个线程都有一个名称用于标识。多个线程的名称可以相同。创建线程时没有指定名称，将自动生成一个
+ *
+ * 除非另有说明，否则将{@code null}参数传递给此类中的构造函数或方法将导致抛出{@link NullPointerException}。
  * @author unascribed
  * @see Runnable
  * @see Runtime#exit(int)
@@ -249,11 +300,18 @@ public class Thread implements Runnable {
     /* The object in which this thread is blocked in an interruptible I/O
      * operation, if any.  The blocker's interrupt method should be invoked
      * after setting this thread's interrupt status.
+     *
+     * 在可中断的IO操作中阻塞线程的对象(如果有的话)。blocker的中断方法应该在设置线程的中断状态之后被调用。
      */
     private volatile Interruptible blocker;
     private final Object blockerLock = new Object();
 
-    /* Set the blocker field; invoked via sun.misc.SharedSecrets from java.nio code
+    /**
+     * Set the blocker field; invoked via sun.misc.SharedSecrets from java.nio code
+     *
+     * 设置blocker属性；来自java.nio代码中的通过sun.misc.SharedSecrets调用
+     * 例如
+     * {@link AbstractInterruptibleChannel#blockedOn(sun.nio.ch.Interruptible)}
      */
     void blockedOn(Interruptible b) {
         synchronized (blockerLock) {
@@ -298,6 +356,16 @@ public class Thread implements Runnable {
      * bugs due to race conditions. It may also be useful when designing
      * concurrency control constructs such as the ones in the
      * {@link java.util.concurrent.locks} package.
+     *
+     * 向调度程序提示当前线程愿意放弃当前使用的处理器。调度程序可以随意忽略此提示。
+     * Yield是启发式尝试，旨在改善线程之间的相对进展否则会过度利用CPU的。
+     * 它的用途应该与详细的分析和基准测试结合起来
+     * 确保它实际上具有所需的效果。
+     *
+     * 很少适合使用此方法。用于调试或测试目的可能有用，可能有助于复现
+     * 由于竞争条件而产生的错误。在设计时也可能有用
+     * 并发控制结构，例如
+     * {@link java.util.concurrent.locks}软件包。
      */
     public static native void yield();
 
@@ -307,16 +375,23 @@ public class Thread implements Runnable {
      * the precision and accuracy of system timers and schedulers. The thread
      * does not lose ownership of any monitors.
      *
+     * 根据系统计时器和调度程序的精度和准确性，
+     * 使当前正在执行的线程进入休眠状态（暂时停止执行）达指定的毫秒数。
+     * 该线程不会失去任何监视器的所有权。
+     *
      * @param  millis
      *         the length of time to sleep in milliseconds
+     *         睡眠时间（以毫秒为单位）
      *
      * @throws  IllegalArgumentException
      *          if the value of {@code millis} is negative
+     *          如果{@code millis}的值为负
      *
      * @throws  InterruptedException
      *          if any thread has interrupted the current thread. The
      *          <i>interrupted status</i> of the current thread is
      *          cleared when this exception is thrown.
+     *          如果有任何线程中断了当前线程。抛出此异常时，将清除当前线程的中断状态。
      */
     public static native void sleep(long millis) throws InterruptedException;
 
@@ -326,7 +401,10 @@ public class Thread implements Runnable {
      * number of nanoseconds, subject to the precision and accuracy of system
      * timers and schedulers. The thread does not lose ownership of any
      * monitors.
-     *  
+     *
+     * 使当前正在执行的线程进入睡眠状态（暂时停止执行）
+     * 指定的毫秒数加上指定的纳秒数，取决于系统计时器和调度程序的精度和准确性。
+     * 该线程不会失去任何monitors所有权。
      * 
      * @param  millis
      *         the length of time to sleep in milliseconds
@@ -342,6 +420,7 @@ public class Thread implements Runnable {
      *          if any thread has interrupted the current thread. The
      *          <i>interrupted status</i> of the current thread is
      *          cleared when this exception is thrown.
+     *          如果有线程中断了当前线程。当这个异常被抛出时，当前线程的interrupted状态被清除。
      */
     public static void sleep(long millis, int nanos)
     throws InterruptedException {
@@ -788,6 +867,7 @@ public class Thread implements Runnable {
     /**
      * This method is called by the system to give a Thread
      * a chance to clean up before it actually exits.
+     * 在系统退出前，由系统回调，进行资源清理
      */
     private void exit() {
         if (group != null) {
@@ -797,6 +877,7 @@ public class Thread implements Runnable {
         /* Aggressively null out all reference fields: see bug 4006245 */
         target = null;
         /* Speed the release of some of these resources */
+        // 加速资源释放
         threadLocals = null;
         inheritableThreadLocals = null;
         inheritedAccessControlContext = null;
@@ -941,14 +1022,38 @@ public class Thread implements Runnable {
      *
      * <p> Interrupting a thread that is not alive need not have any effect.
      *
+     * 中断此线程。
+     *
+     * 除非当前线程正在中断自己（通常是允许这样做的），
+     * 否则将调用此线程的{@link #checkAccess（）checkAccess}方法，
+     * 这可能会引发{@link SecurityException}。
+     *
+     * 如果线程阻塞的调用{@link
+     * Object#wait() wait()}, {@link Object#wait(long) wait(long)}, or {@link
+     * Object#wait(long, int) wait(long, int)} methods of the {@link Object} class,
+     * or of the {@link #join()}, {@link #join(long)}, {@link #join(long, int)}, {@link #sleep(long)}, or {@link #sleep(long, int)}这类方法，
+     * 则其中断状态将被清除，并且将收到{@link InterruptedException}。
+     *
+     * 如果此线程在{@link java.nio.channels.InterruptibleChannel InterruptibleChannel}上的I/O操作中被阻塞，
+     * 则该通道将被关闭，该线程的中断状态将被设置，并且该线程将收到一个{@link java.nio.channels.ClosedByInterruptException}。
+     *
+     * 如果此线程在{@link java.nio.channels.Selector}中被阻塞，
+     * 则将设置该线程的中断状态，并且它将立即从selection操作中返回，
+     * 可能具有非零值，就像selector的{@link java.nio.channels.Selector#wakeup wakeup}方法已被调用。
+     *
+     * 如果没有以上条件，则将设置该线程的中断状态。
+     *
+     * 中断未运行的线程不必产生任何作用。
+     *
      * @throws  SecurityException
      *          if the current thread cannot modify this thread
+     *           如果当前线程不能修改此线程
      *
      * @revised 6.0
      * @spec JSR-51
      */
     public void interrupt() {
-        if (this != Thread.currentThread())
+        if (this != Thread.currentThread())      // 不是当前线程
             checkAccess();
 
         synchronized (blockerLock) {
@@ -969,13 +1074,20 @@ public class Thread implements Runnable {
      * second call would return false (unless the current thread were
      * interrupted again, after the first call had cleared its interrupted
      * status and before the second call had examined it).
+     * 测试当前线程是否已被中断。
+     * 通过该方法可以清除线程的中断状态。
+     * 换句话说，如果要连续两次调用此方法，则
+     * 第二次调用将返回false（除非当前线程再次中断
+     * 第一次调用清除中断状态后，并且在第二次调用对其进行检查之前）。
      *
      * <p>A thread interruption ignored because a thread was not alive
      * at the time of the interrupt will be reflected by this method
      * returning false.
+     * 由于线程在中断时未处于活动状态而忽略的线程中断将由此方法返回false反映出来
      *
      * @return  <code>true</code> if the current thread has been interrupted;
      *          <code>false</code> otherwise.
+     *          如果当前线程已被中断返回true，否则返回false
      * @see #isInterrupted()
      * @revised 6.0
      */
@@ -991,8 +1103,13 @@ public class Thread implements Runnable {
      * at the time of the interrupt will be reflected by this method
      * returning false.
      *
+     * 测试当前线程是否已被中断。此方法不会改变中断状态
+     *
+     * 由于线程在中断时未处于活动状态而忽略的线程中断将由此方法返回false反映出来。
      * @return  <code>true</code> if this thread has been interrupted;
      *          <code>false</code> otherwise.
+     *          如果此线程已被中断返回true，否则返回false
+     *
      * @see     #interrupted()
      * @revised 6.0
      */
@@ -1004,6 +1121,7 @@ public class Thread implements Runnable {
      * Tests if some Thread has been interrupted.  The interrupted state
      * is reset or not based on the value of ClearInterrupted that is
      * passed.
+     * 测试某些线程是否已被中断。根据传递的ClearInterrupted的值重置或不重置中断状态。
      */
     private native boolean isInterrupted(boolean ClearInterrupted);
 
@@ -1032,6 +1150,8 @@ public class Thread implements Runnable {
     /**
      * Tests if this thread is alive. A thread is alive if it has
      * been started and has not yet died.
+     *
+     * 测试此线程是否存活。如果线程已经启动并且还没有死亡那么线程就是存活的。
      *
      * @return  <code>true</code> if this thread is alive;
      *          <code>false</code> otherwise.
@@ -1284,6 +1404,7 @@ public class Thread implements Runnable {
         }
 
         if (millis == 0) {
+            // 线程是否存活
             while (isAlive()) {
                 wait(0);
             }

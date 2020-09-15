@@ -263,6 +263,16 @@ public class Object {
      * <p>
      * Only one thread at a time can own an object's monitor.
      *
+     * 唤醒正在此对象的monitor上等待的单个线程。如果有任何线程在该对象上等待，则选择其中一个唤醒。该选择是任意的，并且可以根据实现情况进行选择。线程通过调用{@code wait}方法之一在对象的monitor上等待。
+     * 在当前线程放弃对该对象的锁定之前，唤醒的线程将无法继续。唤醒的线程将以通常的方式与任何其他可能正在主动竞争以在此对象上进行同步的线程竞争。例如，被唤醒的线程在作为锁定该对象的下一个线程时没有任何可靠的特权或劣势。
+     *
+     * 此方法只能由作为该对象的监视器的所有者的线程调用。线程通过以下三种方式之一成为对象监视器的所有者：
+     *
+     * 通过执行该对象的同步实例方法。
+     * 通过执行在对象上同步的{@code Synchronized}语句的主体。
+     * 对于类型为{@code Class}的对象，请执行该类的同步静态方法。
+     * 一次只能有一个线程拥有对象的监视器。
+     *
      * @throws  IllegalMonitorStateException  if the current thread is not
      *               the owner of this object's monitor.
      * @see        java.lang.Object#notifyAll()
@@ -286,6 +296,11 @@ public class Object {
      * of this object's monitor. See the {@code notify} method for a
      * description of the ways in which a thread can become the owner of
      * a monitor.
+     *
+     * 唤醒正在此对象的监视器上等待的所有线程。线程通过调用{@code wait}方法之一在对象的监视器上等待。
+     * 在当前线程放弃对该对象的锁定之前，唤醒的线程将无法继续。唤醒的线程将以通常的方式与可能正在主动竞争以与此对象进行同步的任何其他线程竞争。例如，被唤醒的线程在成为锁定该对象的下一个线程时没有任何可靠的特权或劣势。
+     *
+     * 此方法只能由作为该对象的监视器的所有者的线程调用。请参阅{@code notify}方法以获取有关线程可以成为监视器所有者的方式的描述。
      *
      * @throws  IllegalMonitorStateException  if the current thread is not
      *               the owner of this object's monitor.

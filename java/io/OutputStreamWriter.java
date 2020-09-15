@@ -32,46 +32,57 @@ import sun.nio.cs.StreamEncoder;
 
 /**
  * An OutputStreamWriter is a bridge from character streams to byte streams:
- * Characters written to it are encoded into bytes using a specified {@link
- * java.nio.charset.Charset charset}.  The charset that it uses
- * may be specified by name or may be given explicitly, or the platform's
- * default charset may be accepted.
+ * Characters written to it are encoded into bytes using a specified
+ * {@link java.nio.charset.Charset charset}. The charset that it uses may be
+ * specified by name or may be given explicitly, or the platform's default
+ * charset may be accepted.
  *
- * <p> Each invocation of a write() method causes the encoding converter to be
- * invoked on the given character(s).  The resulting bytes are accumulated in a
- * buffer before being written to the underlying output stream.  The size of
- * this buffer may be specified, but by default it is large enough for most
- * purposes.  Note that the characters passed to the write() methods are not
- * buffered.
+ * OutputStreamWriter是字符流到字节流的桥梁：使用指定的字符集charset将写入的字符编码成字节。
+ * 字符集可以用名称指定或者被明确指定，或者接受平台的默认字符集
+ * 
+ * <p>
+ * Each invocation of a write() method causes the encoding converter to be
+ * invoked on the given character(s). The resulting bytes are accumulated in a
+ * buffer before being written to the underlying output stream. The size of this
+ * buffer may be specified, but by default it is large enough for most purposes.
+ * Note that the characters passed to the write() methods are not buffered.
  *
- * <p> For top efficiency, consider wrapping an OutputStreamWriter within a
- * BufferedWriter so as to avoid frequent converter invocations.  For example:
+ * 每次调用write（）方法都会使编码转换器在给定字符上被调用。 所得到的字节在写入底层输出流之前累积在缓冲区中。
+ * 可以指定此缓冲区的大小，但是大多数情况默认大小已经足够大。 请注意，传递给write（）方法的字符不会缓冲。
+ * 
+ * <p>
+ * For top efficiency, consider wrapping an OutputStreamWriter within a
+ * BufferedWriter so as to avoid frequent converter invocations. For example:
  *
+ * 为了最高的效率，请考虑在BufferedWriter中包装一个OutputStreamWriter，以避免频繁的转换器调用。 例如：
+ * 
  * <pre>
- * Writer out
- *   = new BufferedWriter(new OutputStreamWriter(System.out));
+ * Writer out = new BufferedWriter(new OutputStreamWriter(System.out));
  * </pre>
  *
- * <p> A <i>surrogate pair</i> is a character represented by a sequence of two
+ * <p>
+ * A <i>surrogate pair</i> is a character represented by a sequence of two
  * <tt>char</tt> values: A <i>high</i> surrogate in the range '&#92;uD800' to
  * '&#92;uDBFF' followed by a <i>low</i> surrogate in the range '&#92;uDC00' to
  * '&#92;uDFFF'.
  *
- * <p> A <i>malformed surrogate element</i> is a high surrogate that is not
- * followed by a low surrogate or a low surrogate that is not preceded by a
- * high surrogate.
+ * <p>
+ * A <i>malformed surrogate element</i> is a high surrogate that is not followed
+ * by a low surrogate or a low surrogate that is not preceded by a high
+ * surrogate.
  *
- * <p> This class always replaces malformed surrogate elements and unmappable
+ * <p>
+ * This class always replaces malformed surrogate elements and unmappable
  * character sequences with the charset's default <i>substitution sequence</i>.
- * The {@linkplain java.nio.charset.CharsetEncoder} class should be used when more
- * control over the encoding process is required.
+ * The {@linkplain java.nio.charset.CharsetEncoder} class should be used when
+ * more control over the encoding process is required.
  *
  * @see BufferedWriter
  * @see OutputStream
  * @see java.nio.charset.Charset
  *
- * @author      Mark Reinhold
- * @since       JDK1.1
+ * @author Mark Reinhold
+ * @since JDK1.1
  */
 
 public class OutputStreamWriter extends Writer {

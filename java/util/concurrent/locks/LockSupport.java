@@ -299,6 +299,19 @@ public class LockSupport {
      * method to return. Callers should re-check the conditions which caused
      * the thread to park in the first place. Callers may also determine,
      * for example, the interrupt status of the thread upon return.
+     *
+     * 除非许可可用，否则为了线程调度的目的阻塞当前线程。
+     *
+     * 如果许可可用，则消费此许可并立即调用return；
+     * 否则，出于线程调度的目的，当前线程将被阻塞，并处于休眠状态，直到发生以下三种情况之一：
+     *      其他一些线程以当前线程为目标调用{@link #unpark unpark}；
+     *      其他一些线程中断{@linkplain Thread#interrupt interrupts}当前线程；
+     *      该调用不合逻辑(即毫无理由)返回。
+     *
+     * 此方法不报告哪些原因导致该方法返回。
+     * 调用者首先应该重新检查导致线程暂停的条件。
+     * 调用者还可以确定，例如，返回时线程的中断状态。
+     *
      */
     public static void park() {
         UNSAFE.park(false, 0L);

@@ -285,6 +285,12 @@ public final class Math {
      * <p>The computed result must be within 1 ulp of the exact result.
      * Results must be semi-monotonic.
      *
+     * 返回的自然对数（以e为底） double值。 特殊情况：
+     * 如果参数为NaN或小于零，则结果为NaN。
+     * 如果参数为无穷大，则结果为正无穷大。
+     * 如果参数为正零或负零，则结果为负无穷大。
+     *
+     * 计算结果必须在精确结果的1 ulp之内。 结果必须是半单调的。
      * @param   a   a value
      * @return  the value ln&nbsp;{@code a}, the natural logarithm of
      *          {@code a}.

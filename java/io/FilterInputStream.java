@@ -38,6 +38,10 @@ package java.io;
  * may further override some of  these methods
  * and may also provide additional methods
  * and fields.
+ * FilterInputStream 包含其他一些输入流，它用作其基本数据源，
+ * 可能会沿途转换数据或提供其他功能。类 FilterInputStream 本身
+ * 只是使用将所有请求传递到包含的输入流的版本简单地覆盖 InputStream 的所有方法。
+ * FilterInputStream 的子类可以进一步覆盖其中的某些方法，还可以提供其他方法和字段。
  *
  * @author  Jonathan Payne
  * @since   JDK1.0

@@ -385,15 +385,17 @@ public class BufferedReader extends Reader {
     }
 
     /**
-     * Reads a line of text.  A line is considered to be terminated by any one
-     * of a line feed ('\n'), a carriage return ('\r'), or a carriage return
-     * followed immediately by a linefeed.
+     * Reads a line of text. A line is considered to be terminated by any one of a
+     * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
+     * immediately by a linefeed.
+     * 
+     * 读一行文字。 一行被视为由换行符（'\ n'），回车符（'\ r'）中的任何一个或随后的换行符终止
+     * 
+     * @return A String containing the contents of the line, not including any
+     *         line-termination characters, or null if the end of the stream has
+     *         been reached
      *
-     * @return     A String containing the contents of the line, not including
-     *             any line-termination characters, or null if the end of the
-     *             stream has been reached
-     *
-     * @exception  IOException  If an I/O error occurs
+     * @exception IOException If an I/O error occurs
      *
      * @see java.nio.file.Files#readAllLines
      */
